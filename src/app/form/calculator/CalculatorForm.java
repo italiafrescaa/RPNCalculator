@@ -203,12 +203,15 @@ public class CalculatorForm {
     }
 
     public static void main(String[] args) {
+        View();
+    }
+
+    public static void View(){
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         JFrame frame = new JFrame("CalculatorForm");
         frame.setContentPane(new CalculatorForm().panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

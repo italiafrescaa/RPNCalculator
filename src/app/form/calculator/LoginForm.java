@@ -31,6 +31,9 @@ public class LoginForm {
 
                 if (login(username, password)) {
                     JOptionPane.showMessageDialog(null, "Login successful!");
+
+                    hideForm();
+                    CalculatorForm.View();
                 } else {
                     JOptionPane.showMessageDialog(null, "Login failed. Invalid username or password.");
                 }
@@ -45,11 +48,22 @@ public class LoginForm {
 
                 if (register(username, password)) {
                     JOptionPane.showMessageDialog(null, "Registration successful!");
+
+                    hideForm();
+                    CalculatorForm.View();
                 } else {
                     JOptionPane.showMessageDialog(null, "Registration failed. Please try again.");
                 }
             }
         });
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("LoginForm");
+        frame.setContentPane(new LoginForm().panel1);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
     }
 
     private boolean login(String username, String password) {
@@ -83,11 +97,10 @@ public class LoginForm {
         }
     }
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("LoginForm");
-        frame.setContentPane(new LoginForm().panel1);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
+    private void hideForm(){
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(panel1);
+        if (frame != null) {
+            frame.setVisible(false);
+        }
     }
 }
