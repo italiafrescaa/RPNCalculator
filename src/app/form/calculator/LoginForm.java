@@ -18,9 +18,7 @@ public class LoginForm {
     private JLabel lbl_password;
     private JButton btn_register;
 
-    private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/dbCalculator";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "";
+    Database DB;
 
     public LoginForm() {
         btn_login.addActionListener(new ActionListener() {
@@ -29,7 +27,7 @@ public class LoginForm {
                 String username = txt_username.getText();
                 String password = txt_password.getText();
 
-                if (login(username, password)) {
+                if (DB.loginUser(username, password)) {
                     JOptionPane.showMessageDialog(null, "Login successful!");
 
                     hideForm();
@@ -46,7 +44,7 @@ public class LoginForm {
                 String username = txt_username.getText();
                 String password = txt_password.getText();
 
-                if (register(username, password)) {
+                if (DB.registerUser(username, password)) {
                     JOptionPane.showMessageDialog(null, "Registration successful!");
 
                     hideForm();
@@ -56,6 +54,8 @@ public class LoginForm {
                 }
             }
         });
+
+        DB = new Database("jdbc:mysql://127.0.0.1:3306/dbCalculator", "root", "");
     }
 
     public static void main(String[] args) {
@@ -66,8 +66,8 @@ public class LoginForm {
         frame.setVisible(true);
     }
 
-    private boolean login(String username, String password) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+    private boolean login(String username, String password){
+        try (Connection connection = DB.getConnection()) {
             String query = "SELECT * FROM users WHERE name = ? AND pass = ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, username);
@@ -83,7 +83,7 @@ public class LoginForm {
     }
 
     private boolean register(String username, String password) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+        try (Connection connection = DB.getConnection()) {
             String query = "INSERT INTO Users (name, pass) VALUES (?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, username);
