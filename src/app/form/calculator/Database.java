@@ -51,5 +51,61 @@ public class Database {
             return false;
         }
     }
+
+    public String getHistory(String username) {
+        int userid=getUserId(username);
+        StringBuilder history = new StringBuilder();
+
+        try (Connection connection = getConnection()) {
+            String query = "SELECT expression FROM history WHERE userid = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, Integer.toString(userid));
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        String expression = resultSet.getString("expression");
+                        history.append(expression).append("\n");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return history.toString();
+    }
+
+    public int getUserId(String username) {
+        try (Connection connection = getConnection()) {
+            String query = "SELECT id FROM users WHERE name = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, username);
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getInt("id");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public void addToHistory(String username, String expression) {
+        try (Connection connection = getConnection()) {
+            int userId = getUserId(username);
+
+            String query = "INSERT INTO history (userid, expression) VALUES (?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setInt(1, userId);
+                statement.setString(2, expression);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
 

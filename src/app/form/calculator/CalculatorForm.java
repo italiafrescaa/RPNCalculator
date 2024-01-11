@@ -3,6 +3,10 @@ package app.form.calculator;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
@@ -30,17 +34,21 @@ public class CalculatorForm {
     private JButton btn_rpn;
     private JButton btn_result;
     private JLabel lbl_result;
+    private JLabel lbl_welcome;
+    private JLabel lbl_username;
+    private JButton btn_history;
 
     private Queue<String> expression;
     private Stack<Character> operators;
 
     Boolean rpn;
 
-    public CalculatorForm() {
+    public CalculatorForm(String username) {
         expression = new LinkedList<>();
         operators = new Stack<>();
 
         rpn = false;
+        lbl_username.setText(username);
 
         btn_0.addActionListener(new ActionListener() {
             @Override
@@ -200,20 +208,26 @@ public class CalculatorForm {
                 lbl_result.setText("0");
             }
         });
+        btn_history.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showHistory();
+            }
+        });
     }
 
     public static void main(String[] args) {
-        View();
+
     }
 
-    public static void View(){
+    public void View(){
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
         } catch (Exception e) {
             e.printStackTrace();
         }
         JFrame frame = new JFrame("CalculatorForm");
-        frame.setContentPane(new CalculatorForm().panel);
+        frame.setContentPane(new CalculatorForm(lbl_username.getText()).panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.pack();
@@ -319,6 +333,7 @@ public class CalculatorForm {
         LoadVars();
         lbl_result.setText(Double.toString(RPNtoResult()));
 
+        addToHistory(lbl_username.getText(), String.valueOf(expression));
         expression.clear();
         CheckFontSize();
     }
@@ -468,5 +483,15 @@ public class CalculatorForm {
             }
             default -> throw new IllegalArgumentException("Unknown operator: " + operator);
         };
+    }
+
+    private void showHistory() {
+        String username = lbl_username.getText();
+        String history = LoginForm.DB.getHistory(username);
+        JOptionPane.showMessageDialog(panel, "History for " + username + ":\n" + history, "History", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void addToHistory(String username, String expression) {
+        LoginForm.DB.addToHistory(username, expression);
     }
 }

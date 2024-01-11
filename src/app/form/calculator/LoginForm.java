@@ -18,7 +18,7 @@ public class LoginForm {
     private JLabel lbl_password;
     private JButton btn_register;
 
-    Database DB;
+    static Database DB;
 
     public LoginForm() {
         btn_login.addActionListener(new ActionListener() {
@@ -31,7 +31,8 @@ public class LoginForm {
                     JOptionPane.showMessageDialog(null, "Login successful!");
 
                     hideForm();
-                    CalculatorForm.View();
+                    CalculatorForm calculatorForm = new CalculatorForm(username);
+                    calculatorForm.View();
                 } else {
                     JOptionPane.showMessageDialog(null, "Login failed. Invalid username or password.");
                 }
@@ -48,7 +49,8 @@ public class LoginForm {
                     JOptionPane.showMessageDialog(null, "Registration successful!");
 
                     hideForm();
-                    CalculatorForm.View();
+                    CalculatorForm calculatorForm = new CalculatorForm(username);
+                    calculatorForm.View();
                 } else {
                     JOptionPane.showMessageDialog(null, "Registration failed. Please try again.");
                 }
@@ -64,37 +66,6 @@ public class LoginForm {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-    }
-
-    private boolean login(String username, String password){
-        try (Connection connection = DB.getConnection()) {
-            String query = "SELECT * FROM users WHERE name = ? AND pass = ?";
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, username);
-                statement.setString(2, password);
-
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    return resultSet.next();
-                }
-            }
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
-    private boolean register(String username, String password) {
-        try (Connection connection = DB.getConnection()) {
-            String query = "INSERT INTO Users (name, pass) VALUES (?, ?)";
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, username);
-                statement.setString(2, password);
-
-                int rowsAffected = statement.executeUpdate();
-                return rowsAffected > 0;
-            }
-        } catch (SQLException e) {
-            return false;
-        }
     }
 
     private void hideForm(){
